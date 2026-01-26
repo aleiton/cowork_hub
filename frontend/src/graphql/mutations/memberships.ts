@@ -16,10 +16,8 @@ export const CREATE_MEMBERSHIP = gql`
     $amenityTier: AmenityTierEnum!
   ) {
     createMembership(
-      input: {
-        membershipType: $membershipType
-        amenityTier: $amenityTier
-      }
+      membershipType: $membershipType
+      amenityTier: $amenityTier
     ) {
       membership {
         id
@@ -41,7 +39,7 @@ export const CREATE_MEMBERSHIP = gql`
 
 export const CREATE_CANTINA_SUBSCRIPTION = gql`
   mutation CreateCantinaSubscription($planType: CantinaPlanTypeEnum!) {
-    createCantinaSubscription(input: { planType: $planType }) {
+    createCantinaSubscription(planType: $planType) {
       cantinaSubscription {
         id
         planType
@@ -61,7 +59,7 @@ export const CREATE_CANTINA_SUBSCRIPTION = gql`
 
 export const USE_CANTINA_CREDIT = gql`
   mutation UseCantinaCredit {
-    useCantinaCredit(input: {}) {
+    useCantinaCredit {
       cantinaSubscription {
         id
         mealsRemaining

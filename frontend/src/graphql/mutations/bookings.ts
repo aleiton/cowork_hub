@@ -64,7 +64,7 @@ export const CREATE_BOOKING = gql`
 
 export const CANCEL_BOOKING = gql`
   mutation CancelBooking($id: ID!) {
-    cancelBooking(input: { id: $id }) {
+    cancelBooking(id: $id) {
       booking {
         id
         status
@@ -81,7 +81,7 @@ export const CANCEL_BOOKING = gql`
 
 export const CONFIRM_BOOKING = gql`
   mutation ConfirmBooking($id: ID!) {
-    confirmBooking(input: { id: $id }) {
+    confirmBooking(id: $id) {
       booking {
         id
         status

@@ -3,14 +3,16 @@
 // =============================================================================
 //
 // Landing page for CoworkHub.
-// This is a Server Component (no "use client"), which means:
-// - It renders on the server
-// - No client-side JavaScript needed for initial render
-// - Better SEO and faster initial load
+// Redirects authenticated users to the dashboard.
 //
 // =============================================================================
 
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { isAuthenticated } from "@/lib/apollo-client";
 
 // Feature cards data
 const features = [
@@ -69,6 +71,14 @@ const workspaceTypes = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.push("/dashboard");
+    }
+  }, [router]);
+
   return (
     <div>
       {/* Hero Section */}

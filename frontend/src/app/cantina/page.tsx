@@ -15,14 +15,14 @@ import { Button, Card, ErrorAlert, SuccessAlert } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 
 const cantinaPlans: { type: CantinaPlanType; label: string; meals: number; price: number; description: string }[] = [
-  { type: "LIGHT", label: "Light", meals: 10, price: 80, description: "Perfect for occasional visits" },
-  { type: "STANDARD", label: "Standard", meals: 20, price: 150, description: "Best value for regular members" },
-  { type: "UNLIMITED", label: "Unlimited", meals: 999, price: 250, description: "Unlimited meals all month" },
+  { type: "FIVE_MEALS", label: "5 Meals", meals: 5, price: 40, description: "Perfect for occasional visits" },
+  { type: "TEN_MEALS", label: "10 Meals", meals: 10, price: 75, description: "Great for weekly lunches" },
+  { type: "TWENTY_MEALS", label: "20 Meals", meals: 20, price: 140, description: "Best value for daily use" },
 ];
 
 export default function CantinaPage() {
   const router = useRouter();
-  const [selectedPlan, setSelectedPlan] = useState<CantinaPlanType>("STANDARD");
+  const [selectedPlan, setSelectedPlan] = useState<CantinaPlanType>("TEN_MEALS");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -220,7 +220,7 @@ export default function CantinaPage() {
           size="lg"
           className="px-12"
         >
-          {subscription ? "Change to" : "Subscribe to"} {selectedPlan} Plan - $
+          {subscription ? "Change to" : "Subscribe to"} {cantinaPlans.find((p) => p.type === selectedPlan)?.label} Plan - $
           {cantinaPlans.find((p) => p.type === selectedPlan)?.price}
         </Button>
       </div>

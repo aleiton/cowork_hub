@@ -26,7 +26,7 @@ export type MembershipType = "DAY_PASS" | "WEEKLY" | "MONTHLY" | "ANNUAL";
 
 export type UserRole = "GUEST" | "MEMBER" | "ADMIN";
 
-export type CantinaPlanType = "LIGHT" | "STANDARD" | "UNLIMITED";
+export type CantinaPlanType = "FIVE_MEALS" | "TEN_MEALS" | "TWENTY_MEALS";
 
 // -----------------------------------------------------------------------------
 // MODELS
