@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+# =============================================================================
+# RACK CONFIG
+# =============================================================================
+#
+# This file is used by Rack-based servers (Puma, Unicorn) to start the app.
+# It tells the server how to load and run the Rails application.
+#
+# =============================================================================
+
+require_relative 'config/environment'
+
+run Rails.application
+Rails.application.load_server

@@ -1,0 +1,67 @@
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
+#
+# PostgreSQL is our database of choice because:
+# 1. JSONB support - we use this for storing equipment_used in bookings
+# 2. Full-text search - useful for searching workspaces
+# 3. Strong data integrity with constraints
+# 4. Excellent performance and reliability
+# 5. Industry standard for production Rails applications
+#
+# YAML Anchors (&default) allow us to define settings once and reuse them.
+# The <<: *default syntax merges the default settings into each environment.
+#
+# =============================================================================
+
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # Use a connection pool sized for the number of threads/workers.
+  # Puma defaults to 5 threads, so 5 is a reasonable pool size.
+  # In production, tune this based on your server configuration.
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # Connection timeout in milliseconds
+  timeout: 5000
+
+# =============================================================================
+# DEVELOPMENT
+# =============================================================================
+# Local development database. You'll need PostgreSQL installed locally.
+# Create the database with: rails db:create
+development:
+  <<: *default
+  database: cowork_hub_development
+  # For local development, typically no username/password needed if you
+  # configured PostgreSQL to trust local connections.
+  # If you need credentials:
+  # username: your_postgres_user
+  # password: your_postgres_password
+  host: localhost
+
+# =============================================================================
+# TEST
+# =============================================================================
+# Separate database for running tests. Gets wiped and recreated frequently.
+# Never point this to a database with real data!
+test:
+  <<: *default
+  database: cowork_hub_test
+  host: localhost
+
+# =============================================================================
+# PRODUCTION
+# =============================================================================
+# In production, use environment variables for security.
+# Never commit production credentials to version control!
+#
+# Heroku and similar platforms set DATABASE_URL automatically.
+# Format: postgres://username:password@host:port/database
+production:
+  <<: *default
+  database: cowork_hub_production
+  username: <%= ENV['COWORK_HUB_DATABASE_USERNAME'] %>
+  password: <%= ENV['COWORK_HUB_DATABASE_PASSWORD'] %>
+  host: <%= ENV['COWORK_HUB_DATABASE_HOST'] %>
+  # URL takes precedence over individual settings if provided
+  url: <%= ENV['DATABASE_URL'] %>

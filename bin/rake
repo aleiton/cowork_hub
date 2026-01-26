@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# =============================================================================
+# RAKE BINSTUB
+# =============================================================================
+#
+# Rake is Ruby's build automation tool, similar to Make in C/C++.
+# It's used in Rails for running tasks like:
+#   - rake db:migrate (run database migrations)
+#   - rake db:seed (load seed data)
+#   - rake routes (list all routes)
+#   - rake -T (list all available tasks)
+#
+# WHY THIS FILE EXISTS:
+# This binstub ensures that when you run `bin/rake` or `bundle exec rake`,
+# you're using the correct version of Rake that's bundled with this project,
+# not a system-wide version that might be different.
+#
+# HOW IT WORKS:
+# 1. Loads config/boot.rb which sets up Bundler and the gem environment
+# 2. Requires the Rake library
+# 3. Runs Rake with any command-line arguments you passed
+#
+# =============================================================================
+
+require_relative '../config/boot'
+require 'rake'
+Rake.application.run

@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# =============================================================================
+# RAILS BINSTUB
+# =============================================================================
+#
+# This file is the entry point for the `rails` command in this project.
+# It loads the Rails application and runs the requested command.
+#
+# Binstubs are wrapper scripts in the bin/ directory that:
+# 1. Ensure the correct Ruby version and gems are used
+# 2. Load the application environment
+# 3. Execute the actual command
+#
+# =============================================================================
+
+APP_PATH = File.expand_path('../config/application', __dir__)
+require_relative '../config/boot'
+require 'rails/commands'
