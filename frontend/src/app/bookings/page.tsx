@@ -58,7 +58,10 @@ export default function BookingsPage() {
     }
   };
 
-  if (loading) {
+  // Show loading on initial load or when fetching
+  const isLoading = loading || !data;
+
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="h-8 bg-gray-200 rounded w-1/4 mb-8 animate-pulse" />
