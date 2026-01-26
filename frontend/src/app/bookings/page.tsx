@@ -175,7 +175,7 @@ export default function BookingsPage() {
             startTime: string;
             endTime: string;
             status: BookingStatus;
-            totalCost: number;
+            calculatedPrice: number;
             durationHours: number;
             workspace: { id: string; name: string; workspaceType: string };
           }) => (
@@ -210,9 +210,9 @@ export default function BookingsPage() {
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(booking.status)}`}>
                       {booking.status}
                     </span>
-                    {booking.totalCost && (
+                    {booking.calculatedPrice && (
                       <p className="text-lg font-semibold text-gray-900 mt-2">
-                        ${booking.totalCost.toFixed(2)}
+                        ${booking.calculatedPrice.toFixed(2)}
                       </p>
                     )}
                   </div>

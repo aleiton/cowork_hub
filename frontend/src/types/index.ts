@@ -79,7 +79,7 @@ export interface Booking {
   user?: User;
   workspace?: Workspace;
   // Computed
-  totalCost?: number;
+  calculatedPrice?: number;
   durationHours?: number;
 }
 
@@ -93,8 +93,8 @@ export interface Membership {
   // Relations
   user?: User;
   // Computed
-  active?: boolean;
-  daysRemaining?: number;
+  isActive?: boolean;
+  remainingDays?: number;
 }
 
 export interface CantinaSubscription {
@@ -106,7 +106,7 @@ export interface CantinaSubscription {
   // Relations
   user?: User;
   // Computed
-  active?: boolean;
+  isActive?: boolean;
 }
 
 // -----------------------------------------------------------------------------

@@ -46,15 +46,15 @@ export const GET_ME_WITH_MEMBERSHIP = gql`
       amenityTier
       startsAt
       endsAt
-      active
-      daysRemaining
+      isActive
+      remainingDays
     }
     myCantinaSubscription {
       id
       planType
       mealsRemaining
       renewsAt
-      active
+      isActive
     }
   }
 `;
@@ -73,7 +73,7 @@ export const GET_MY_BOOKINGS = gql`
       endTime
       status
       equipmentUsed
-      totalCost
+      calculatedPrice
       durationHours
       workspace {
         id
@@ -97,8 +97,8 @@ export const GET_MY_MEMBERSHIPS = gql`
       amenityTier
       startsAt
       endsAt
-      active
-      daysRemaining
+      isActive
+      remainingDays
     }
   }
 `;

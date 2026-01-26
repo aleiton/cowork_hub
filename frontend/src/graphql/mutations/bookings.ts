@@ -47,7 +47,7 @@ export const CREATE_BOOKING = gql`
         startTime
         endTime
         status
-        totalCost
+        calculatedPrice
         workspace {
           id
           name

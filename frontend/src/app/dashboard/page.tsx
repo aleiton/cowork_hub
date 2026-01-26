@@ -120,7 +120,7 @@ export default function DashboardPage() {
                 </span>
               </div>
               <p className="text-sm text-gray-600">
-                {membership.daysRemaining} days remaining
+                {membership.remainingDays} days remaining
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 Expires: {formatDate(membership.endsAt)}
