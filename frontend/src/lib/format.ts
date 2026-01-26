@@ -43,3 +43,32 @@ export function formatWorkspaceType(type: string): string {
   };
   return labels[type] || type;
 }
+
+export type TierInfo = {
+  color: string;
+  features: string[];
+};
+
+export function getTierInfo(tier: string): TierInfo {
+  const info: Record<string, TierInfo> = {
+    BASIC: {
+      color: "bg-gray-100 text-gray-700",
+      features: ["WiFi", "Basic furniture", "Shared amenities"],
+    },
+    STANDARD: {
+      color: "bg-blue-100 text-blue-700",
+      features: ["High-speed WiFi", "Ergonomic furniture", "Coffee & tea", "Printing"],
+    },
+    PREMIUM: {
+      color: "bg-purple-100 text-purple-700",
+      features: [
+        "Fiber internet",
+        "Premium furniture",
+        "Unlimited refreshments",
+        "Dedicated support",
+        "Meeting room credits",
+      ],
+    },
+  };
+  return info[tier] || info.BASIC;
+}
