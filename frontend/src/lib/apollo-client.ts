@@ -76,7 +76,7 @@ export const apolloClient = new ApolloClient({
           // Workspaces are keyed by their arguments (filters)
           workspaces: {
             // Merge incoming data with existing cache
-            merge(existing = [], incoming) {
+            merge(_, incoming) {
               return incoming;
             },
           },

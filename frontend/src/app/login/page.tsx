@@ -6,7 +6,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { setAuthToken, apolloClient } from "@/lib/apollo-client";
 import { Input, Button, ErrorAlert, Alert, Card } from "@/components/ui";
 

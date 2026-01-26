@@ -74,12 +74,11 @@ export function Button({
   }
 
   // Render as button
-  const { href, ...buttonProps } = props as ButtonAsButton & { href?: never };
   return (
     <button
       className={combinedStyles}
-      disabled={loading || buttonProps.disabled}
-      {...buttonProps}
+      disabled={loading || (props as ButtonAsButton).disabled}
+      {...(props as ButtonAsButton)}
     >
       {content}
     </button>

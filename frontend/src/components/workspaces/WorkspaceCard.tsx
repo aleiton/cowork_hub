@@ -3,7 +3,7 @@
 // =============================================================================
 
 import Link from "next/link";
-import { Workspace, WorkspaceType, AmenityTier } from "@/types";
+import { Workspace, WorkspaceType } from "@/types";
 import { TierBadge } from "@/components/ui";
 import { formatWorkspaceType, formatCurrency } from "@/lib/format";
 
