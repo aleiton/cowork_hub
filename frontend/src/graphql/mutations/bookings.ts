@@ -33,13 +33,11 @@ export const CREATE_BOOKING = gql`
     $equipmentIds: [ID!]
   ) {
     createBooking(
-      input: {
-        workspaceId: $workspaceId
-        date: $date
-        startTime: $startTime
-        endTime: $endTime
-        equipmentIds: $equipmentIds
-      }
+      workspaceId: $workspaceId
+      date: $date
+      startTime: $startTime
+      endTime: $endTime
+      equipmentIds: $equipmentIds
     ) {
       booking {
         id
