@@ -13,3 +13,4 @@ export { Badge, StatusBadge, TierBadge } from "./Badge";
 export { Input } from "./Input";
 export { Select } from "./Select";
 export { Card, CardHeader, CardTitle } from "./Card";
+export { Divider } from "./Divider";

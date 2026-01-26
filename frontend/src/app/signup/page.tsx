@@ -6,8 +6,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { setAuthToken, apolloClient } from "@/lib/apollo-client";
-import { Input, Button, ErrorAlert, Card } from "@/components/ui";
+import { signUp } from "@/lib/auth";
+import { Input, Button, ErrorAlert, Card, Divider } from "@/components/ui";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -16,6 +16,9 @@ export default function SignupPage() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Real-time password match validation
+  const passwordMismatch = passwordConfirmation.length > 0 && password !== passwordConfirmation;
 
   const validateForm = (): boolean => {
     const newErrors: string[] = [];
@@ -31,41 +34,18 @@ export default function SignupPage() {
     if (!validateForm()) return;
 
     setLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/users`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({
-            user: { email, password, password_confirmation: passwordConfirmation },
-          }),
-        }
-      );
 
-      const authHeader = response.headers.get("Authorization");
+    const result = await signUp({ email, password, passwordConfirmation });
 
-      if (response.ok && authHeader) {
-        setAuthToken(authHeader.replace("Bearer ", ""));
-        await apolloClient.resetStore();
-        router.push("/dashboard");
-      } else {
-        const data = await response.json();
-        if (data.errors) {
-          const errorMessages = Object.entries(data.errors).flatMap(
-            ([field, messages]) =>
-              (messages as string[]).map((msg) => `${field.charAt(0).toUpperCase() + field.slice(1)} ${msg}`)
-          );
-          setErrors(errorMessages);
-        } else {
-          setErrors([data.error || "Registration failed. Please try again."]);
-        }
-      }
-    } catch {
-      setErrors(["Unable to connect to server. Please try again."]);
-    } finally {
-      setLoading(false);
+    if (result.success) {
+      router.push("/dashboard");
+    } else if (result.errors) {
+      setErrors(result.errors);
+    } else {
+      setErrors([result.error || "Registration failed"]);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -99,15 +79,20 @@ export default function SignupPage() {
               minLength={6}
             />
 
-            <Input
-              label="Confirm password"
-              type="password"
-              value={passwordConfirmation}
-              onChange={(e) => setPasswordConfirmation(e.target.value)}
-              required
-              autoComplete="new-password"
-              placeholder="••••••••"
-            />
+            <div>
+              <Input
+                label="Confirm password"
+                type="password"
+                value={passwordConfirmation}
+                onChange={(e) => setPasswordConfirmation(e.target.value)}
+                required
+                autoComplete="new-password"
+                placeholder="••••••••"
+              />
+              {passwordMismatch && (
+                <p className="mt-1 text-sm text-red-600">Passwords don&apos;t match</p>
+              )}
+            </div>
 
             {errors.length > 0 && (
               <ErrorAlert>
@@ -126,14 +111,7 @@ export default function SignupPage() {
             </p>
           </form>
 
-          <div className="mt-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Already have an account?</span>
-            </div>
-          </div>
+          <Divider className="mt-6">Already have an account?</Divider>
 
           <div className="mt-6">
             <Button href="/login" variant="outline" className="w-full">

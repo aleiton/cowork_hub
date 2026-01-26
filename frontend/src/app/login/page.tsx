@@ -6,8 +6,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { setAuthToken, apolloClient } from "@/lib/apollo-client";
-import { Input, Button, ErrorAlert, Alert, Card } from "@/components/ui";
+import { signIn } from "@/lib/auth";
+import { Input, Button, ErrorAlert, Alert, Card, Divider } from "@/components/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,31 +21,15 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/users/sign_in`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({ user: { email, password } }),
-        }
-      );
+    const result = await signIn({ email, password });
 
-      const authHeader = response.headers.get("Authorization");
-
-      if (response.ok && authHeader) {
-        setAuthToken(authHeader.replace("Bearer ", ""));
-        await apolloClient.resetStore();
-        router.push("/dashboard");
-      } else {
-        const data = await response.json();
-        setError(data.error || "Invalid email or password");
-      }
-    } catch {
-      setError("Unable to connect to server. Please try again.");
-    } finally {
-      setLoading(false);
+    if (result.success) {
+      router.push("/dashboard");
+    } else {
+      setError(result.error || "Login failed");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -85,14 +69,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Don&apos;t have an account?</span>
-            </div>
-          </div>
+          <Divider className="mt-6">Don&apos;t have an account?</Divider>
 
           <div className="mt-6">
             <Button href="/signup" variant="outline" className="w-full">
