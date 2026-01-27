@@ -9,7 +9,7 @@ import { useMutation } from "@apollo/client/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CREATE_BOOKING } from "@/graphql/mutations/bookings";
-import { WorkshopEquipment } from "@/types";
+import { WorkshopEquipment, CreateBookingResponse } from "@/types";
 
 interface BookingFormProps {
   workspaceId: string;
@@ -46,9 +46,9 @@ export function BookingForm({ workspaceId, isWorkshop, equipment, isAuthenticate
   const [bookingError, setBookingError] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
-  const [createBooking, { loading: bookingLoading }] = useMutation(CREATE_BOOKING, {
+  const [createBooking, { loading: bookingLoading }] = useMutation<CreateBookingResponse>(CREATE_BOOKING, {
     onCompleted: (data) => {
-      if (data.createBooking.errors.length > 0) {
+      if (data?.createBooking.errors.length > 0) {
         setBookingError(data.createBooking.errors.join(", "));
       } else {
         setBookingSuccess(true);

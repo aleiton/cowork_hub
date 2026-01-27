@@ -129,6 +129,37 @@ export interface MyBookingsQueryResult {
   myBookings: Booking[];
 }
 
+export interface MeWithMembershipQueryResult {
+  me: User | null;
+  myCurrentMembership: Membership | null;
+  myCantinaSubscription: CantinaSubscription | null;
+}
+
+export interface MyMembershipsQueryResult {
+  myMemberships: Membership[];
+}
+
+export interface CreateMembershipResult {
+  createMembership: {
+    membership: Membership | null;
+    errors: string[];
+  };
+}
+
+export interface CreateCantinaSubscriptionResult {
+  createCantinaSubscription: {
+    cantinaSubscription: CantinaSubscription | null;
+    errors: string[];
+  };
+}
+
+export interface UseCantinaCredResult {
+  useCantinaCredit: {
+    cantinaSubscription: CantinaSubscription | null;
+    errors: string[];
+  };
+}
+
 // -----------------------------------------------------------------------------
 // MUTATION INPUT TYPES
 // -----------------------------------------------------------------------------

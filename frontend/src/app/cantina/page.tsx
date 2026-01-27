@@ -10,7 +10,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { GET_ME_WITH_MEMBERSHIP } from "@/graphql/queries/user";
 import { CREATE_CANTINA_SUBSCRIPTION, USE_CANTINA_CREDIT } from "@/graphql/mutations/memberships";
 import { isAuthenticated } from "@/lib/apollo-client";
-import { CantinaPlanType } from "@/types";
+import { CantinaPlanType, MeWithMembershipQueryResult, CreateCantinaSubscriptionResult, UseCantinaCredResult } from "@/types";
 import { Button, Card, ErrorAlert, SuccessAlert } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 
@@ -34,14 +34,14 @@ export default function CantinaPage() {
   }, [router]);
 
   // Fetch current subscription
-  const { data, loading, refetch } = useQuery(GET_ME_WITH_MEMBERSHIP, {
+  const { data, loading, refetch } = useQuery<MeWithMembershipQueryResult>(GET_ME_WITH_MEMBERSHIP, {
     skip: typeof window === "undefined" || !isAuthenticated(),
   });
 
   // Create subscription mutation
-  const [createSubscription, { loading: creating }] = useMutation(CREATE_CANTINA_SUBSCRIPTION, {
+  const [createSubscription, { loading: creating }] = useMutation<CreateCantinaSubscriptionResult>(CREATE_CANTINA_SUBSCRIPTION, {
     onCompleted: (data) => {
-      if (data.createCantinaSubscription.errors?.length > 0) {
+      if (data?.createCantinaSubscription.errors?.length > 0) {
         setError(data.createCantinaSubscription.errors.join(", "));
       } else {
         setSuccess("Subscription created successfully!");
@@ -55,9 +55,9 @@ export default function CantinaPage() {
   });
 
   // Use credit mutation
-  const [consumeCredit, { loading: consumingCredit }] = useMutation(USE_CANTINA_CREDIT, {
+  const [consumeCredit, { loading: consumingCredit }] = useMutation<UseCantinaCredResult>(USE_CANTINA_CREDIT, {
     onCompleted: (data) => {
-      if (data.useCantinaCredit.errors?.length > 0) {
+      if (data?.useCantinaCredit.errors?.length > 0) {
         setError(data.useCantinaCredit.errors.join(", "));
       } else {
         setSuccess("Meal credit used! Enjoy your meal.");
@@ -191,19 +191,13 @@ export default function CantinaPage() {
               <div className="flex items-center text-gray-600">
                 <span className="text-2xl mr-2">🍽️</span>
                 <span>
-                  {type === "UNLIMITED" ? (
-                    <strong>Unlimited meals</strong>
-                  ) : (
-                    <>
-                      <strong>{meals}</strong> meals included
-                    </>
-                  )}
+                  <strong>{meals}</strong> meals included
                 </span>
               </div>
 
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <p className="text-sm text-gray-500">
-                  ${type === "UNLIMITED" ? "Best for daily use" : `$${(price / meals).toFixed(2)} per meal`}
+                  ${(price / meals).toFixed(2)} per meal
                 </p>
               </div>
             </div>

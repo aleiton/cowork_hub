@@ -21,6 +21,7 @@ import { useState } from "react";
 import { useQuery } from "@apollo/client/react";
 import { GET_ME } from "@/graphql/queries/user";
 import { clearAuthToken } from "@/lib/apollo-client";
+import { MeQueryResult } from "@/types";
 
 // Navigation links configuration
 const publicLinks = [
@@ -38,7 +39,7 @@ export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Fetch current user to determine auth state
-  const { data, loading } = useQuery(GET_ME, {
+  const { data, loading } = useQuery<MeQueryResult>(GET_ME, {
     // Don't throw on error (user might not be logged in)
     errorPolicy: "ignore",
   });

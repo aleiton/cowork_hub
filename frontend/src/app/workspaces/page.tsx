@@ -7,7 +7,7 @@
 import { useState } from "react";
 import { useQuery } from "@apollo/client/react";
 import { GET_WORKSPACES } from "@/graphql/queries/workspaces";
-import { Workspace, WorkspaceType, AmenityTier } from "@/types";
+import { Workspace, WorkspaceType, AmenityTier, WorkspacesQueryResult } from "@/types";
 import { Select, SkeletonCard, ErrorAlert, EmptyState, Button } from "@/components/ui";
 import { WorkspaceCard } from "@/components/workspaces/WorkspaceCard";
 
@@ -30,7 +30,7 @@ export default function WorkspacesPage() {
   const [typeFilter, setTypeFilter] = useState<WorkspaceType | "">("");
   const [tierFilter, setTierFilter] = useState<AmenityTier | "">("");
 
-  const { data, loading, error } = useQuery(GET_WORKSPACES, {
+  const { data, loading, error } = useQuery<WorkspacesQueryResult>(GET_WORKSPACES, {
     variables: {
       workspaceType: typeFilter || undefined,
       amenityTier: tierFilter || undefined,

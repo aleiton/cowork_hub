@@ -11,7 +11,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { GET_MY_BOOKINGS } from "@/graphql/queries/user";
 import { CANCEL_BOOKING } from "@/graphql/mutations/bookings";
 import { isAuthenticated } from "@/lib/apollo-client";
-import { BookingStatus } from "@/types";
+import { BookingStatus, MyBookingsQueryResult } from "@/types";
 import { Select, Button, SkeletonCard, ErrorAlert, EmptyState } from "@/components/ui";
 import { BookingCard, BookingData } from "@/components/bookings";
 
@@ -36,7 +36,7 @@ export default function BookingsPage() {
   }, [router]);
 
   // Fetch bookings
-  const { data, loading, error, refetch } = useQuery(GET_MY_BOOKINGS, {
+  const { data, loading, error, refetch } = useQuery<MyBookingsQueryResult>(GET_MY_BOOKINGS, {
     variables: {
       status: statusFilter || undefined,
       upcomingOnly: showUpcomingOnly,

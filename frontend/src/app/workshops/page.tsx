@@ -8,12 +8,12 @@
 import Link from "next/link";
 import { useQuery } from "@apollo/client/react";
 import { GET_WORKSHOPS } from "@/graphql/queries/workspaces";
-import { Workspace } from "@/types";
+import { Workspace, WorkspacesQueryResult } from "@/types";
 import { SkeletonCard, ErrorAlert, EmptyState, TierBadge } from "@/components/ui";
 import { formatCurrency } from "@/lib/format";
 
 export default function WorkshopsPage() {
-  const { data, loading, error } = useQuery(GET_WORKSHOPS);
+  const { data, loading, error } = useQuery<WorkspacesQueryResult>(GET_WORKSHOPS);
   const workshops: Workspace[] = data?.workspaces || [];
 
   return (

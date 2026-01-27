@@ -9,11 +9,12 @@ import { useQuery } from "@apollo/client/react";
 import { useRouter } from "next/navigation";
 import { GET_ME } from "@/graphql/queries/user";
 import { clearAuthToken, isAuthenticated } from "@/lib/apollo-client";
+import { MeQueryResult } from "@/types";
 
 export function useAuth() {
   const router = useRouter();
 
-  const { data, loading, error } = useQuery(GET_ME, {
+  const { data, loading, error } = useQuery<MeQueryResult>(GET_ME, {
     skip: typeof window === "undefined" || !isAuthenticated(),
     errorPolicy: "ignore",
   });

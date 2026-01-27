@@ -10,7 +10,7 @@ import { formatDate } from "@/lib/format";
 interface MembershipData {
   membershipType: string;
   amenityTier: string;
-  remainingDays: number;
+  remainingDays?: number;
   endsAt: string;
 }
 
@@ -31,9 +31,11 @@ export function MembershipCard({ membership }: MembershipCardProps) {
               {membership.amenityTier}
             </span>
           </div>
-          <p className="text-sm text-gray-600">
-            {membership.remainingDays} days remaining
-          </p>
+          {membership.remainingDays !== undefined && (
+            <p className="text-sm text-gray-600">
+              {membership.remainingDays} days remaining
+            </p>
+          )}
           <p className="text-xs text-gray-500 mt-1">
             Expires: {formatDate(membership.endsAt)}
           </p>

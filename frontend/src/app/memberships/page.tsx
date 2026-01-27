@@ -10,7 +10,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { GET_ME_WITH_MEMBERSHIP } from "@/graphql/queries/user";
 import { CREATE_MEMBERSHIP } from "@/graphql/mutations/memberships";
 import { isAuthenticated } from "@/lib/apollo-client";
-import { MembershipType, AmenityTier } from "@/types";
+import { MembershipType, AmenityTier, MeWithMembershipQueryResult, CreateMembershipResult } from "@/types";
 import { Button, Card, ErrorAlert, SuccessAlert } from "@/components/ui";
 import { formatDate, getTierInfo } from "@/lib/format";
 
@@ -42,14 +42,14 @@ export default function MembershipsPage() {
   }, [router]);
 
   // Fetch current membership
-  const { data, loading, refetch } = useQuery(GET_ME_WITH_MEMBERSHIP, {
+  const { data, loading, refetch } = useQuery<MeWithMembershipQueryResult>(GET_ME_WITH_MEMBERSHIP, {
     skip: typeof window === "undefined" || !isAuthenticated(),
   });
 
   // Create membership mutation
-  const [createMembership, { loading: creating }] = useMutation(CREATE_MEMBERSHIP, {
+  const [createMembership, { loading: creating }] = useMutation<CreateMembershipResult>(CREATE_MEMBERSHIP, {
     onCompleted: (data) => {
-      if (data.createMembership.errors?.length > 0) {
+      if (data?.createMembership.errors?.length > 0) {
         setError(data.createMembership.errors.join(", "));
       } else {
         setSuccess(true);

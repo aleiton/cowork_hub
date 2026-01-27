@@ -22,7 +22,7 @@ interface BookingItem {
   startTime: string;
   endTime: string;
   status: BookingStatus;
-  workspace: {
+  workspace?: {
     name: string;
     workspaceType: string;
   };
@@ -75,7 +75,7 @@ export function UpcomingBookings({ bookings, loading }: UpcomingBookingsProps) {
 
 // Individual booking item
 function BookingListItem({ booking }: { booking: BookingItem }) {
-  const icon = workspaceIcons[booking.workspace.workspaceType] || "🏢";
+  const icon = booking.workspace ? workspaceIcons[booking.workspace.workspaceType] || "🏢" : "🏢";
 
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -84,7 +84,7 @@ function BookingListItem({ booking }: { booking: BookingItem }) {
           <span className="text-xl">{icon}</span>
         </div>
         <div>
-          <h3 className="font-medium text-gray-900">{booking.workspace.name}</h3>
+          <h3 className="font-medium text-gray-900">{booking.workspace?.name || "Workspace"}</h3>
           <p className="text-sm text-gray-500">
             {formatDate(booking.date)} • {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
           </p>

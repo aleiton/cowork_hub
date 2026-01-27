@@ -4,12 +4,12 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client/react";
 import Link from "next/link";
 import { GET_WORKSPACE } from "@/graphql/queries/workspaces";
 import { GET_ME } from "@/graphql/queries/user";
-import { Workspace } from "@/types";
+import { Workspace, WorkspaceQueryResult, MeQueryResult } from "@/types";
 import {
   WorkspaceHeader,
   AmenitiesList,
@@ -25,22 +25,22 @@ export default function WorkspaceDetailPage({ params }: PageProps) {
   const [id, setId] = useState<string | null>(null);
 
   // Unwrap params (Next.js 15+ makes params a Promise)
-  if (!id) {
+  useEffect(() => {
     params.then((p) => setId(p.id));
-  }
+  }, [params]);
 
   // Fetch workspace details
-  const { data, loading, error } = useQuery(GET_WORKSPACE, {
+  const { data, loading, error } = useQuery<WorkspaceQueryResult>(GET_WORKSPACE, {
     variables: { id },
     skip: !id,
   });
 
   // Check if user is authenticated
-  const { data: userData } = useQuery(GET_ME, {
+  const { data: userData } = useQuery<MeQueryResult>(GET_ME, {
     errorPolicy: "ignore",
   });
 
-  const workspace: Workspace | null = data?.workspace;
+  const workspace: Workspace | null = data?.workspace ?? null;
   const isAuthenticated = !!userData?.me;
   const isWorkshop = workspace?.workspaceType === "WORKSHOP";
 

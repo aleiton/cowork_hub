@@ -22,9 +22,9 @@ export interface BookingData {
   startTime: string;
   endTime: string;
   status: BookingStatus;
-  calculatedPrice: number;
-  durationHours: number;
-  workspace: {
+  calculatedPrice?: number;
+  durationHours?: number;
+  workspace?: {
     id: string;
     name: string;
     workspaceType: string;
@@ -38,7 +38,7 @@ interface BookingCardProps {
 }
 
 export function BookingCard({ booking, onCancel, cancelling }: BookingCardProps) {
-  const icon = workspaceIcons[booking.workspace.workspaceType] || "🏢";
+  const icon = booking.workspace ? workspaceIcons[booking.workspace.workspaceType] || "🏢" : "🏢";
   const canCancel = booking.status === "PENDING" || booking.status === "CONFIRMED";
 
   return (
@@ -50,17 +50,25 @@ export function BookingCard({ booking, onCancel, cancelling }: BookingCardProps)
             <span className="text-2xl">{icon}</span>
           </div>
           <div>
-            <Link
-              href={`/workspaces/${booking.workspace.id}`}
-              className="font-semibold text-gray-900 hover:text-indigo-600"
-            >
-              {booking.workspace.name}
-            </Link>
+            {booking.workspace ? (
+              <Link
+                href={`/workspaces/${booking.workspace.id}`}
+                className="font-semibold text-gray-900 hover:text-indigo-600"
+              >
+                {booking.workspace.name}
+              </Link>
+            ) : (
+              <span className="font-semibold text-gray-900">Workspace</span>
+            )}
             <p className="text-gray-600 mt-1">{formatDateLong(booking.date)}</p>
             <p className="text-sm text-gray-500">
               {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
-              <span className="mx-2">•</span>
-              {booking.durationHours} hour{booking.durationHours !== 1 ? "s" : ""}
+              {booking.durationHours && (
+                <>
+                  <span className="mx-2">•</span>
+                  {booking.durationHours} hour{booking.durationHours !== 1 ? "s" : ""}
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -69,7 +77,7 @@ export function BookingCard({ booking, onCancel, cancelling }: BookingCardProps)
         <div className="flex items-center gap-4">
           <div className="text-right">
             <StatusBadge status={booking.status} />
-            {booking.calculatedPrice > 0 && (
+            {booking.calculatedPrice && booking.calculatedPrice > 0 && (
               <p className="text-lg font-semibold text-gray-900 mt-2">
                 {formatCurrency(booking.calculatedPrice)}
               </p>

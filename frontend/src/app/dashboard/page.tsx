@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client/react";
 import { GET_ME_WITH_MEMBERSHIP, GET_MY_BOOKINGS } from "@/graphql/queries/user";
 import { isAuthenticated } from "@/lib/apollo-client";
+import { MeWithMembershipQueryResult, MyBookingsQueryResult } from "@/types";
 import {
   MembershipCard,
   CantinaCard,
@@ -29,19 +30,19 @@ export default function DashboardPage() {
   }, [router]);
 
   // Fetch user data with membership and subscription
-  const { data: userData, loading: userLoading } = useQuery(GET_ME_WITH_MEMBERSHIP, {
+  const { data: userData, loading: userLoading } = useQuery<MeWithMembershipQueryResult>(GET_ME_WITH_MEMBERSHIP, {
     skip: typeof window === "undefined" || !isAuthenticated(),
   });
 
   // Fetch upcoming bookings
-  const { data: bookingsData, loading: bookingsLoading } = useQuery(GET_MY_BOOKINGS, {
+  const { data: bookingsData, loading: bookingsLoading } = useQuery<MyBookingsQueryResult>(GET_MY_BOOKINGS, {
     variables: { upcomingOnly: true },
     skip: typeof window === "undefined" || !isAuthenticated(),
   });
 
   const user = userData?.me;
-  const membership = userData?.myCurrentMembership;
-  const cantinaSubscription = userData?.myCantinaSubscription;
+  const membership = userData?.myCurrentMembership ?? null;
+  const cantinaSubscription = userData?.myCantinaSubscription ?? null;
   const upcomingBookings = bookingsData?.myBookings?.slice(0, 3) || [];
 
   // Loading state
