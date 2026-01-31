@@ -1,0 +1,71 @@
+# frozen_string_literal: true
+
+# =============================================================================
+# SIDEKIQ CONFIGURATION
+# =============================================================================
+#
+# This file configures Sidekiq worker processes and scheduled jobs.
+#
+# RUNNING SIDEKIQ:
+#   bundle exec sidekiq -C config/sidekiq.yml
+#
+# MONITORING:
+#   Web UI available at http://localhost:3000/sidekiq (development only)
+#
+# =============================================================================
+
+# Number of threads per Sidekiq process.
+# Each thread can process one job at a time.
+# Rule of thumb: Set to match your database connection pool size.
+:concurrency: 5
+
+# Maximum time (seconds) a job can run before being killed.
+# Jobs taking longer than this are forcefully terminated.
+:timeout: 25
+
+# =============================================================================
+# QUEUES
+# =============================================================================
+# Queues are processed in order of priority (top = highest priority).
+# Jobs in 'critical' are processed before 'default', etc.
+#
+# Usage in jobs:
+#   class MyJob < ApplicationJob
+#     queue_as :critical
+#   end
+
+:queues:
+  - critical    # Payment processing, security alerts
+  - default     # Standard jobs (booking completion, etc.)
+  - low         # Reports, cleanup, non-urgent tasks
+
+# =============================================================================
+# SCHEDULED JOBS
+# =============================================================================
+# These jobs run automatically on a schedule (like cron).
+# Powered by sidekiq-scheduler gem.
+#
+# Schedule formats:
+#   every: '1h'          - Every hour
+#   every: '30m'         - Every 30 minutes
+#   every: '1d'          - Every day (at midnight)
+#   cron: '0 * * * *'    - Cron syntax (every hour at minute 0)
+#   cron: '0 9 * * *'    - Every day at 9:00 AM
+#
+# =============================================================================
+
+:schedule:
+  # ---------------------------------------------------------------------------
+  # BOOKING COMPLETION JOB
+  # ---------------------------------------------------------------------------
+  # Marks bookings as 'completed' once their date and end_time have passed.
+  # This keeps booking statuses accurate for reporting and user dashboards.
+  #
+  # Frequency: Every hour
+  # Queue: default
+  # ---------------------------------------------------------------------------
+  booking_completion:
+    every: '1h'
+    class: BookingCompletionJob
+    queue: default
+    description: 'Mark past bookings as completed'

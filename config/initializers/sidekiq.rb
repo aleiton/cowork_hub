@@ -14,7 +14,7 @@
 # - Calling external APIs
 # - Generating reports
 # - Cleanup tasks
-# - Scheduled jobs (like membership expiration checks)
+# - Scheduled jobs (like booking completion)
 #
 # HOW IT WORKS:
 # 1. Your Rails app enqueues a job (adds it to Redis)
@@ -28,12 +28,15 @@
 # - Persistence options (jobs survive restarts)
 # - Pub/sub for real-time notifications
 #
-# ALTERNATIVES:
-# - DelayedJob: Uses your database as a queue (simpler but slower)
-# - Resque: Also uses Redis, but one job per process (less efficient)
-# - GoodJob: Uses PostgreSQL (no Redis dependency)
+# RUNNING SIDEKIQ:
+#   bundle exec sidekiq -C config/sidekiq.yml
+#
+# MONITORING:
+#   Web UI at http://localhost:3000/sidekiq (development only)
 #
 # =============================================================================
+
+require 'sidekiq-scheduler'
 
 # Configure Redis connection for Sidekiq
 Sidekiq.configure_server do |config|
@@ -47,6 +50,18 @@ Sidekiq.configure_server do |config|
 
   # Configure the server logger
   config.logger.level = Logger.const_get(ENV.fetch('LOG_LEVEL', 'INFO').upcase)
+
+  # Load the schedule from sidekiq.yml
+  # sidekiq-scheduler reads the :schedule key automatically
+  config.on(:startup) do
+    schedule_file = Rails.root.join('config', 'sidekiq.yml')
+
+    if File.exist?(schedule_file)
+      schedule = YAML.load_file(schedule_file)[:schedule]
+      SidekiqScheduler::Scheduler.instance.rufus_scheduler_options = { max_work_threads: 5 }
+      Sidekiq.schedule = schedule if schedule
+    end
+  end
 end
 
 Sidekiq.configure_client do |config|
@@ -56,17 +71,3 @@ Sidekiq.configure_client do |config|
     pool_timeout: 5
   }
 end
-
-# =============================================================================
-# SIDEKIQ OPTIONS
-# =============================================================================
-# These are typically set via command line or sidekiq.yml, but can be here too.
-
-# You can also create a config/sidekiq.yml file with:
-# ---
-# :concurrency: 5
-# :queues:
-#   - critical
-#   - default
-#   - low
-# :timeout: 25

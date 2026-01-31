@@ -118,6 +118,13 @@ gem 'graphiql-rails', group: :development
 # Sidekiq is faster and handles high throughput better.
 gem 'sidekiq', '~> 7.2'
 
+# sidekiq-scheduler allows running jobs on a schedule (like cron).
+# Perfect for recurring tasks like:
+# - Marking past bookings as completed
+# - Sending reminder emails
+# - Cleaning up expired data
+gem 'sidekiq-scheduler', '~> 5.0'
+
 # =============================================================================
 # UTILITIES
 # =============================================================================

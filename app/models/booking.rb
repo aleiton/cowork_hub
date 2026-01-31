@@ -79,8 +79,8 @@ class Booking < ApplicationRecord
   # Set default status if not provided
   after_initialize :set_default_status, if: :new_record?
 
-  # Auto-complete bookings that have passed (could also be a background job)
-  # after_save :check_completion
+  # NOTE: Booking completion is handled by BookingCompletionJob (runs hourly)
+  # See config/sidekiq.yml for schedule configuration
 
   # ===========================================================================
   # SCOPES

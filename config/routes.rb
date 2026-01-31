@@ -62,15 +62,21 @@ Rails.application.routes.draw do
   # SIDEKIQ WEB UI (Background Jobs)
   # ===========================================================================
   # Sidekiq provides a web dashboard to monitor background jobs.
-  # In production, protect this with authentication!
+  # Features:
+  # - View queued, processing, and completed jobs
+  # - Retry failed jobs
+  # - View scheduled jobs (sidekiq-scheduler)
+  # - Real-time statistics
+  #
   # Access it at: http://localhost:3000/sidekiq
-  require 'sidekiq/web'
-
-  # In production, wrap this with authentication:
-  # authenticate :user, ->(user) { user.admin? } do
-  #   mount Sidekiq::Web => '/sidekiq'
-  # end
-  mount Sidekiq::Web => '/sidekiq' if Rails.env.development?
+  #
+  # NOTE: In production, protect this with authentication!
+  # See: https://github.com/sidekiq/sidekiq/wiki/Monitoring#authentication
+  if Rails.env.development?
+    require 'sidekiq/web'
+    require 'sidekiq-scheduler/web'
+    mount Sidekiq::Web => '/sidekiq'
+  end
 
   # ===========================================================================
   # HEALTH CHECK
