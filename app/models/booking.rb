@@ -269,13 +269,15 @@ class Booking < ApplicationRecord
     return if equipment_used.blank?
     return unless workspace && date && start_time && end_time
 
-    equipment_used.each do |equipment_id|
-      equipment = WorkshopEquipment.find_by(id: equipment_id)
-      next unless equipment
+    unavailable_equipment.each do |equipment|
+      errors.add(:equipment_used, "#{equipment.name} is not available at the selected time")
+    end
+  end
 
-      unless equipment.available_at?(date: date, start_time: start_time, end_time: end_time)
-        errors.add(:equipment_used, "#{equipment.name} is not available at the selected time")
-      end
+  # Find equipment that is not available at the booking time
+  def unavailable_equipment
+    WorkshopEquipment.where(id: equipment_used).reject do |equipment|
+      equipment.available_at?(date: date, start_time: start_time, end_time: end_time)
     end
   end
 end
