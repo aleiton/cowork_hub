@@ -1,0 +1,174 @@
+#!/bin/bash
+
+# =============================================================================
+# FLY.IO DEPLOYMENT HELPER
+# =============================================================================
+#
+# This script helps with first-time setup and deployment to Fly.io.
+#
+# Usage:
+#   bin/fly-deploy setup    # First-time setup
+#   bin/fly-deploy deploy   # Deploy the application
+#   bin/fly-deploy logs     # View application logs
+#   bin/fly-deploy console  # Open Rails console
+#
+# =============================================================================
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+print_step() {
+  echo -e "${GREEN}==>${NC} $1"
+}
+
+print_warning() {
+  echo -e "${YELLOW}Warning:${NC} $1"
+}
+
+print_error() {
+  echo -e "${RED}Error:${NC} $1"
+}
+
+check_flyctl() {
+  if ! command -v flyctl &> /dev/null; then
+    print_error "flyctl is not installed."
+    echo "Install it with: brew install flyctl"
+    echo "Or visit: https://fly.io/docs/hands-on/install-flyctl/"
+    exit 1
+  fi
+}
+
+setup() {
+  print_step "Starting Fly.io setup for CoworkHub..."
+
+  check_flyctl
+
+  # Check if logged in
+  if ! flyctl auth whoami &> /dev/null; then
+    print_step "Logging in to Fly.io..."
+    flyctl auth login
+  else
+    print_step "Already logged in as $(flyctl auth whoami)"
+  fi
+
+  # Check if app exists
+  if flyctl status &> /dev/null; then
+    print_warning "App already exists. Skipping app creation."
+  else
+    print_step "Creating Fly.io app..."
+    flyctl launch --no-deploy --copy-config --name cowork-hub-api
+  fi
+
+  # Create PostgreSQL if not attached
+  print_step "Checking PostgreSQL..."
+  if flyctl postgres list 2>/dev/null | grep -q "cowork-hub-db"; then
+    print_warning "PostgreSQL database already exists."
+  else
+    print_step "Creating PostgreSQL database..."
+    flyctl postgres create --name cowork-hub-db --region scl --vm-size shared-cpu-1x --initial-cluster-size 1 --volume-size 1
+
+    print_step "Attaching database to app..."
+    flyctl postgres attach cowork-hub-db
+  fi
+
+  # Set secrets
+  print_step "Setting up secrets..."
+  echo ""
+  echo "You need to set the following secrets:"
+  echo ""
+
+  if [ -f "config/master.key" ]; then
+    MASTER_KEY=$(cat config/master.key)
+    echo "  RAILS_MASTER_KEY: Found in config/master.key"
+  else
+    print_warning "config/master.key not found. Generate it with: rails credentials:edit"
+    MASTER_KEY=""
+  fi
+
+  echo ""
+  echo "Run the following command to set secrets:"
+  echo ""
+  echo "  flyctl secrets set \\"
+  echo "    RAILS_MASTER_KEY='${MASTER_KEY}' \\"
+  echo "    SECRET_KEY_BASE='\$(rails secret)' \\"
+  echo "    DEVISE_JWT_SECRET_KEY='\$(rails secret)' \\"
+  echo "    DEVISE_PEPPER='\$(rails secret)' \\"
+  echo "    REDIS_URL='redis://YOUR_UPSTASH_URL'"
+  echo ""
+  echo "For REDIS_URL:"
+  echo "  1. Create a free account at https://upstash.com"
+  echo "  2. Create a Redis database"
+  echo "  3. Copy the connection string"
+  echo ""
+
+  print_step "Setup complete! Next steps:"
+  echo "  1. Set the secrets shown above"
+  echo "  2. Run: bin/fly-deploy deploy"
+}
+
+deploy() {
+  print_step "Deploying to Fly.io..."
+  check_flyctl
+  flyctl deploy
+
+  print_step "Scaling processes..."
+  flyctl scale count web=1 worker=1 --yes
+
+  print_step "Deployment complete!"
+  echo ""
+  echo "Your app is available at: https://cowork-hub-api.fly.dev"
+  echo ""
+  echo "Useful commands:"
+  echo "  flyctl status         # Check app status"
+  echo "  flyctl logs           # View logs"
+  echo "  bin/fly-deploy logs   # View logs (alias)"
+}
+
+logs() {
+  check_flyctl
+  flyctl logs
+}
+
+console() {
+  check_flyctl
+  print_step "Opening Rails console..."
+  flyctl ssh console -C "bin/rails console"
+}
+
+status() {
+  check_flyctl
+  flyctl status
+}
+
+# Main script
+case "$1" in
+  setup)
+    setup
+    ;;
+  deploy)
+    deploy
+    ;;
+  logs)
+    logs
+    ;;
+  console)
+    console
+    ;;
+  status)
+    status
+    ;;
+  *)
+    echo "Usage: bin/fly-deploy [command]"
+    echo ""
+    echo "Commands:"
+    echo "  setup    - First-time setup (create app, database)"
+    echo "  deploy   - Deploy the application"
+    echo "  logs     - View application logs"
+    echo "  console  - Open Rails console"
+    echo "  status   - Check app status"
+    ;;
+esac

@@ -37,12 +37,20 @@ environment ENV.fetch('RAILS_ENV', 'development')
 # Pid file location
 pidfile ENV.fetch('PIDFILE', 'tmp/pids/server.pid')
 
-# Workers configuration (uncomment for production)
+# Workers configuration for production
 # Workers are forked processes for parallel request handling
-# workers ENV.fetch("WEB_CONCURRENCY") { 2 }
+# WEB_CONCURRENCY controls the number of worker processes
+workers ENV.fetch('WEB_CONCURRENCY', 0)
 
-# Preload the application for faster worker spawning (with workers)
-# preload_app!
+# Preload the application for faster worker spawning and memory efficiency
+# This loads the app before forking workers, sharing memory via copy-on-write
+preload_app! if ENV.fetch('WEB_CONCURRENCY', 0).to_i > 0
+
+# Lifecycle hooks for forked workers
+on_worker_boot do
+  # Reconnect to database after fork
+  ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+end
 
 # Allow Puma to be restarted by the `bin/rails restart` command
 plugin :tmp_restart

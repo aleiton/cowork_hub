@@ -52,14 +52,22 @@ Sidekiq.configure_server do |config|
   config.logger.level = Logger.const_get(ENV.fetch('LOG_LEVEL', 'INFO').upcase)
 
   # Load the schedule from sidekiq.yml
-  # sidekiq-scheduler reads the :schedule key automatically
+  # sidekiq-scheduler reads the :scheduler/:schedule key automatically
   config.on(:startup) do
     schedule_file = Rails.root.join('config', 'sidekiq.yml')
 
     if File.exist?(schedule_file)
-      schedule = YAML.load_file(schedule_file)[:schedule]
-      SidekiqScheduler::Scheduler.instance.rufus_scheduler_options = { max_work_threads: 5 }
-      Sidekiq.schedule = schedule if schedule
+      # Use safe_load_file with permitted classes for Ruby 3.1+ / Psych 4+
+      config_data = YAML.safe_load_file(
+        schedule_file,
+        permitted_classes: [Symbol],
+        symbolize_names: true
+      )
+      schedule = config_data.dig(:scheduler, :schedule)
+      if schedule
+        SidekiqScheduler::Scheduler.instance.rufus_scheduler_options = { max_work_threads: 5 }
+        Sidekiq.schedule = schedule
+      end
     end
   end
 end

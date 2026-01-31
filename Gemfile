@@ -118,6 +118,9 @@ gem 'graphiql-rails', group: :development
 # Sidekiq is faster and handles high throughput better.
 gem 'sidekiq', '~> 7.2'
 
+# Pin connection_pool to 2.x for Sidekiq compatibility
+gem 'connection_pool', '~> 2.4'
+
 # sidekiq-scheduler allows running jobs on a schedule (like cron).
 # Perfect for recurring tasks like:
 # - Marking past bookings as completed
@@ -204,3 +207,7 @@ group :test do
   # Helps identify untested code paths.
   gem 'simplecov', '~> 0.22', require: false
 end
+
+gem "dockerfile-rails", ">= 1.7", group: :development
+
+gem "redis", "~> 5.4"

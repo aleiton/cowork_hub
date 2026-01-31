@@ -1,0 +1,53 @@
+# fly.toml app configuration file generated for cowork-hub-api on 2026-01-31T18:36:07-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'cowork-hub-api'
+primary_region = 'gru'
+kill_signal = 'SIGINT'
+kill_timeout = '5s'
+console_command = '/rails/bin/rails console'
+
+[build]
+
+[deploy]
+  release_command = 'bin/rails db:migrate'
+
+[env]
+  PORT = '3000'
+  RAILS_ENV = 'production'
+  RAILS_LOG_TO_STDOUT = 'true'
+  RAILS_MAX_THREADS = '3'
+  RAILS_SERVE_STATIC_FILES = 'true'
+  # Single process mode (no forking) to fit in 256MB
+  WEB_CONCURRENCY = '0'
+
+[processes]
+  web = 'bin/rails server -b 0.0.0.0 -p 3000'
+  worker = 'bundle exec sidekiq'
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['web']
+
+  [[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/health'
+
+[[vm]]
+  memory = '256mb'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 256
+
+[[statics]]
+  guest_path = '/rails/public'
+  url_prefix = '/'

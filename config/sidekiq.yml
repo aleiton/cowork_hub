@@ -54,18 +54,19 @@
 #
 # =============================================================================
 
-:schedule:
-  # ---------------------------------------------------------------------------
-  # BOOKING COMPLETION JOB
-  # ---------------------------------------------------------------------------
-  # Marks bookings as 'completed' once their date and end_time have passed.
-  # This keeps booking statuses accurate for reporting and user dashboards.
-  #
-  # Frequency: Every hour
-  # Queue: default
-  # ---------------------------------------------------------------------------
-  booking_completion:
-    every: '1h'
-    class: BookingCompletionJob
-    queue: default
-    description: 'Mark past bookings as completed'
+:scheduler:
+  :schedule:
+    # ---------------------------------------------------------------------------
+    # BOOKING COMPLETION JOB
+    # ---------------------------------------------------------------------------
+    # Marks bookings as 'completed' once their date and end_time have passed.
+    # This keeps booking statuses accurate for reporting and user dashboards.
+    #
+    # Frequency: Every hour
+    # Queue: default
+    # ---------------------------------------------------------------------------
+    booking_completion:
+      every: '1h'
+      class: BookingCompletionJob
+      queue: default
+      description: 'Mark past bookings as completed'

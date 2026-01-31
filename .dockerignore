@@ -1,0 +1,76 @@
+# =============================================================================
+# DOCKER IGNORE
+# =============================================================================
+# Files to exclude from Docker build context for smaller, faster builds.
+# =============================================================================
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+LICENSE
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.circleci
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Environment files (secrets!)
+.env
+.env.*
+!.env.example
+
+# Ruby development
+.ruby-version
+.ruby-gemset
+.rvmrc
+.bundle/config
+
+# Test files
+spec/
+test/
+coverage/
+.rspec
+
+# Development files
+.rubocop.yml
+.rubocop_todo.yml
+Brewfile
+
+# Frontend (deployed separately)
+frontend/
+
+# Logs and temp files
+log/
+tmp/
+storage/
+
+# Database files
+db/*.sqlite3
+db/*.sqlite3-*
+
+# macOS
+.DS_Store
+
+# Node (if any)
+node_modules/
+
+# Credentials (handled via secrets)
+config/master.key
+config/credentials/*.key
+
+# Fly.io local
+.fly/
+
+# Development databases
+*.dump
+*.sql

@@ -38,11 +38,10 @@ Rails.application.configure do
   # CACHING
   # ===========================================================================
 
-  # Enable caching with Redis (recommended) or memory.
-  # Redis is better for multi-server deployments.
-  config.cache_store = :redis_cache_store, {
-    url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/0')
-  }
+  # Use memory store for Rails caching (sufficient for single-instance API)
+  # Sidekiq uses Redis directly for job queue (separate from this cache)
+  # 32 MB = 32 * 1024 * 1024 bytes
+  config.cache_store = :memory_store, { size: 33_554_432 }
 
   # ===========================================================================
   # STATIC FILES
@@ -66,6 +65,13 @@ Rails.application.configure do
 
   # Force all access to be over HTTPS. This is critical for security.
   # HTTPS encrypts all traffic including authentication tokens.
+  # Exclude health check path since Fly.io handles SSL at the proxy level
+  # and internal health checks use HTTP.
+  config.ssl_options = {
+    redirect: {
+      exclude: ->(request) { request.path.start_with?('/health') }
+    }
+  }
   config.force_ssl = true
 
   # ===========================================================================
@@ -138,11 +144,14 @@ Rails.application.configure do
   # DNS REBINDING PROTECTION
   # ===========================================================================
 
-  # Allow requests from known hostnames (add your domain).
-  # This protects against DNS rebinding attacks.
-  # config.hosts << "coworkhub.com"
-  # config.hosts << "api.coworkhub.com"
+  # Allow requests from known hostnames.
+  # Fly.io uses .fly.dev domain for apps.
+  config.hosts << '.fly.dev'
+  config.hosts << 'cowork-hub-api.fly.dev'
 
-  # Clear hosts to disable protection (less secure, but simpler for initial setup)
-  # config.hosts.clear
+  # Allow health checks from internal Fly.io IPs
+  config.host_authorization = { exclude: ->(request) { request.path == '/health' } }
+
+  # If you have a custom domain, add it here:
+  # config.hosts << "api.coworkhub.com"
 end

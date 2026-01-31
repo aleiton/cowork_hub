@@ -1,0 +1,24 @@
+#!/bin/bash -e
+
+# =============================================================================
+# DOCKER ENTRYPOINT - CoworkHub
+# =============================================================================
+#
+# This script runs when the container starts.
+# It prepares the environment and starts the appropriate process.
+#
+# =============================================================================
+
+# Enable jemalloc for reduced memory usage and latency
+if [ -z "${LD_PRELOAD+x}" ] && [ -f /usr/lib/*/libjemalloc.so.2 ]; then
+  export LD_PRELOAD="$(echo /usr/lib/*/libjemalloc.so.2)"
+fi
+
+# If running the rails server, prepare the database
+if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+  echo "==> Preparing database..."
+  ./bin/rails db:prepare
+fi
+
+# Execute the main process
+exec "${@}"

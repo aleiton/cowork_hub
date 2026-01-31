@@ -1,0 +1,14 @@
+# =============================================================================
+# PROCFILE.DEV - Development Process Manager
+# =============================================================================
+#
+# Run all development processes with:
+#   foreman start -f Procfile.dev
+#
+# Or if using overmind:
+#   overmind start -f Procfile.dev
+#
+# =============================================================================
+
+web: bin/rails server -p 3000
+worker: bundle exec sidekiq -C config/sidekiq.yml

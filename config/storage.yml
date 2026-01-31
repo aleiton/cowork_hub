@@ -1,0 +1,35 @@
+# =============================================================================
+# ACTIVE STORAGE CONFIGURATION
+# =============================================================================
+#
+# Active Storage handles file uploads (images, documents, etc.)
+# Configure different storage backends for different environments.
+#
+# =============================================================================
+
+# Local disk storage (development and test)
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+# Test storage (ephemeral)
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+# Production storage options:
+#
+# Amazon S3:
+# amazon:
+#   service: S3
+#   access_key_id: <%= ENV['AWS_ACCESS_KEY_ID'] %>
+#   secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
+#   region: us-east-1
+#   bucket: your_bucket_name
+#
+# Google Cloud Storage:
+# google:
+#   service: GCS
+#   project: your_project
+#   credentials: <%= ENV['GOOGLE_CREDENTIALS'] %>
+#   bucket: your_bucket_name
