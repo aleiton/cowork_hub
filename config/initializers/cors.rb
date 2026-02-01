@@ -46,8 +46,11 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
           /\Ahttp:\/\/localhost:\d+\z/ # Regex for any localhost port
         ]
       else
-        # In production, only allow your specific frontend domain
-        ENV.fetch('FRONTEND_URL', 'https://coworkhub.com')
+        # In production, allow specific frontend domains
+        # FRONTEND_URL can be comma-separated for multiple origins
+        frontend_urls = ENV.fetch('FRONTEND_URL', 'https://coworkhub.com').split(',').map(&:strip)
+        # Also allow Vercel preview deployments
+        frontend_urls + [/\Ahttps:\/\/.*\.vercel\.app\z/]
       end
     )
 
