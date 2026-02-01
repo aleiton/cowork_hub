@@ -78,12 +78,14 @@ export default function LoginPage() {
           </div>
         </Card>
 
-        <Alert variant="info" className="mt-6">
-          <p className="font-medium mb-1">Demo Credentials</p>
-          <p><strong>Admin:</strong> admin@coworkhub.com</p>
-          <p><strong>Member:</strong> member1@example.com</p>
-          <p className="mt-1">Password: <code className="bg-blue-100 px-1 rounded">password123</code></p>
-        </Alert>
+{process.env.NODE_ENV === "development" && (
+          <Alert variant="info" className="mt-6">
+            <p className="font-medium mb-1">Demo Credentials</p>
+            <p><strong>Admin:</strong> admin@coworkhub.com</p>
+            <p><strong>Member:</strong> member1@example.com</p>
+            <p className="mt-1">Password: <code className="bg-blue-100 px-1 rounded">password123</code></p>
+          </Alert>
+        )}
       </div>
     </div>
   );

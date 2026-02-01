@@ -30,40 +30,48 @@ def log(emoji, message)
 end
 
 # =============================================================================
-# USERS
+# USERS (Development/Test only)
 # =============================================================================
-log '👤', 'Creating users...'
-
-# Admin user - for testing admin features
-admin = User.find_or_create_by!(email: 'admin@coworkhub.com') do |user|
-  user.password = 'password123'
-  user.role = :admin
-end
-log '✓', "Admin user created: #{admin.email}"
-
-# Member users - for testing member features
+# Test users with known passwords should NEVER be created in production
+admin = nil
 members = []
-5.times do |i|
-  member = User.find_or_create_by!(email: "member#{i + 1}@example.com") do |user|
-    user.password = 'password123'
-    user.role = :member
-  end
-  members << member
-end
-log '✓', "Created #{members.count} member users"
-
-# Guest users - for testing guest restrictions
 guests = []
-2.times do |i|
-  guest = User.find_or_create_by!(email: "guest#{i + 1}@example.com") do |user|
-    user.password = 'password123'
-    user.role = :guest
-  end
-  guests << guest
-end
-log '✓', "Created #{guests.count} guest users"
+all_users = []
 
-all_users = [admin] + members + guests
+if Rails.env.development? || Rails.env.test?
+  log '👤', 'Creating test users (development only)...'
+
+  # Admin user - for testing admin features
+  admin = User.find_or_create_by!(email: 'admin@coworkhub.com') do |user|
+    user.password = 'password123'
+    user.role = :admin
+  end
+  log '✓', "Admin user created: #{admin.email}"
+
+  # Member users - for testing member features
+  5.times do |i|
+    member = User.find_or_create_by!(email: "member#{i + 1}@example.com") do |user|
+      user.password = 'password123'
+      user.role = :member
+    end
+    members << member
+  end
+  log '✓', "Created #{members.count} member users"
+
+  # Guest users - for testing guest restrictions
+  2.times do |i|
+    guest = User.find_or_create_by!(email: "guest#{i + 1}@example.com") do |user|
+      user.password = 'password123'
+      user.role = :guest
+    end
+    guests << guest
+  end
+  log '✓', "Created #{guests.count} guest users"
+
+  all_users = [admin] + members + guests
+else
+  log '⏭️', 'Skipping test users in production'
+end
 
 # =============================================================================
 # WORKSPACES - Traditional Work Spaces
@@ -198,114 +206,123 @@ log '✓', "Created #{workshops.count} maker workshops with equipment"
 all_workspaces = hot_desks + private_offices + meeting_rooms + workshops
 
 # =============================================================================
-# MEMBERSHIPS
+# MEMBERSHIPS, CANTINA, BOOKINGS (Development/Test only)
 # =============================================================================
-log '🎫', 'Creating memberships...'
+# Sample data tied to test users - skip in production
 
-# Give some members active memberships
-membership_configs = [
-  { user: members[0], type: :monthly, tier: :premium },
-  { user: members[1], type: :monthly, tier: :basic },
-  { user: members[2], type: :weekly, tier: :premium },
-  { user: members[3], type: :day_pass, tier: :basic }
-  # members[4] has no membership (for testing)
-]
+if Rails.env.development? || Rails.env.test?
+  # ===========================================================================
+  # MEMBERSHIPS
+  # ===========================================================================
+  log '🎫', 'Creating memberships...'
 
-memberships = membership_configs.map do |config|
-  Membership.find_or_create_by!(user: config[:user]) do |m|
-    m.membership_type = config[:type]
-    m.amenity_tier = config[:tier]
-    m.starts_at = Time.current - rand(1..15).days
+  # Give some members active memberships
+  membership_configs = [
+    { user: members[0], type: :monthly, tier: :premium },
+    { user: members[1], type: :monthly, tier: :basic },
+    { user: members[2], type: :weekly, tier: :premium },
+    { user: members[3], type: :day_pass, tier: :basic }
+    # members[4] has no membership (for testing)
+  ]
+
+  memberships = membership_configs.map do |config|
+    Membership.find_or_create_by!(user: config[:user]) do |m|
+      m.membership_type = config[:type]
+      m.amenity_tier = config[:tier]
+      m.starts_at = Time.current - rand(1..15).days
+    end
   end
-end
-log '✓', "Created #{memberships.count} active memberships"
+  log '✓', "Created #{memberships.count} active memberships"
 
-# Create an expired membership for testing
-expired_membership = Membership.create!(
-  user: guests[0],
-  membership_type: :weekly,
-  amenity_tier: :basic,
-  starts_at: 2.weeks.ago,
-  ends_at: 1.week.ago
-)
-log '✓', 'Created 1 expired membership'
-
-# =============================================================================
-# CANTINA SUBSCRIPTIONS
-# =============================================================================
-log '🍽️', 'Creating cantina subscriptions...'
-
-cantina_configs = [
-  { user: members[0], plan: :twenty_meals, remaining: 15 },
-  { user: members[1], plan: :ten_meals, remaining: 7 },
-  { user: members[2], plan: :five_meals, remaining: 2 }
-  # members[3] and [4] have no subscription
-]
-
-cantina_subs = cantina_configs.map do |config|
-  CantinaSubscription.find_or_create_by!(user: config[:user]) do |cs|
-    cs.plan_type = config[:plan]
-    cs.meals_remaining = config[:remaining]
-    cs.renews_at = 2.weeks.from_now
-  end
-end
-log '✓', "Created #{cantina_subs.count} cantina subscriptions"
-
-# =============================================================================
-# BOOKINGS
-# =============================================================================
-log '📅', 'Creating sample bookings...'
-
-# Helper to create a booking for a specific day
-def create_sample_booking(user, workspace, days_offset, status: :confirmed, equipment_ids: [])
-  date = Date.current + days_offset
-  start_hour = rand(8..16)
-  duration = rand(1..4)
-
-  Booking.create!(
-    user: user,
-    workspace: workspace,
-    date: date,
-    start_time: Time.zone.parse("#{date} #{start_hour}:00"),
-    end_time: Time.zone.parse("#{date} #{start_hour + duration}:00"),
-    status: status,
-    equipment_used: equipment_ids
+  # Create an expired membership for testing
+  expired_membership = Membership.create!(
+    user: guests[0],
+    membership_type: :weekly,
+    amenity_tier: :basic,
+    starts_at: 2.weeks.ago,
+    ends_at: 1.week.ago
   )
-rescue ActiveRecord::RecordInvalid => e
-  puts "  Skipped booking: #{e.message}"
-  nil
-end
+  log '✓', 'Created 1 expired membership'
 
-bookings = []
+  # ===========================================================================
+  # CANTINA SUBSCRIPTIONS
+  # ===========================================================================
+  log '🍽️', 'Creating cantina subscriptions...'
 
-# Create upcoming bookings for members
-members.first(3).each do |member|
-  3.times do |i|
-    ws = all_workspaces.sample
-    equipment_ids = ws.workshop? ? ws.workshop_equipments.sample(rand(1..2)).pluck(:id) : []
-    booking = create_sample_booking(member, ws, rand(1..14), equipment_ids: equipment_ids)
-    bookings << booking if booking
+  cantina_configs = [
+    { user: members[0], plan: :twenty_meals, remaining: 15 },
+    { user: members[1], plan: :ten_meals, remaining: 7 },
+    { user: members[2], plan: :five_meals, remaining: 2 }
+    # members[3] and [4] have no subscription
+  ]
+
+  cantina_subs = cantina_configs.map do |config|
+    CantinaSubscription.find_or_create_by!(user: config[:user]) do |cs|
+      cs.plan_type = config[:plan]
+      cs.meals_remaining = config[:remaining]
+      cs.renews_at = 2.weeks.from_now
+    end
   end
-end
+  log '✓', "Created #{cantina_subs.count} cantina subscriptions"
 
-# Create some past bookings (completed)
-members.first(2).each do |member|
-  2.times do
-    ws = all_workspaces.sample
-    booking = create_sample_booking(member, ws, -rand(1..30), status: :completed)
-    bookings << booking if booking
+  # ===========================================================================
+  # BOOKINGS
+  # ===========================================================================
+  log '📅', 'Creating sample bookings...'
+
+  # Helper to create a booking for a specific day
+  def create_sample_booking(user, workspace, days_offset, status: :confirmed, equipment_ids: [])
+    date = Date.current + days_offset
+    start_hour = rand(8..16)
+    duration = rand(1..4)
+
+    Booking.create!(
+      user: user,
+      workspace: workspace,
+      date: date,
+      start_time: Time.zone.parse("#{date} #{start_hour}:00"),
+      end_time: Time.zone.parse("#{date} #{start_hour + duration}:00"),
+      status: status,
+      equipment_used: equipment_ids
+    )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "  Skipped booking: #{e.message}"
+    nil
   end
+
+  bookings = []
+
+  # Create upcoming bookings for members
+  members.first(3).each do |member|
+    3.times do |i|
+      ws = all_workspaces.sample
+      equipment_ids = ws.workshop? ? ws.workshop_equipments.sample(rand(1..2)).pluck(:id) : []
+      booking = create_sample_booking(member, ws, rand(1..14), equipment_ids: equipment_ids)
+      bookings << booking if booking
+    end
+  end
+
+  # Create some past bookings (completed)
+  members.first(2).each do |member|
+    2.times do
+      ws = all_workspaces.sample
+      booking = create_sample_booking(member, ws, -rand(1..30), status: :completed)
+      bookings << booking if booking
+    end
+  end
+
+  # Create a pending booking
+  pending_booking = create_sample_booking(members[0], meeting_rooms.first, 3, status: :pending)
+  bookings << pending_booking if pending_booking
+
+  # Create a cancelled booking
+  cancelled_booking = create_sample_booking(members[1], hot_desks.first, 5, status: :cancelled)
+  bookings << cancelled_booking if cancelled_booking
+
+  log '✓', "Created #{bookings.compact.count} bookings"
+else
+  log '⏭️', 'Skipping sample memberships, cantina, and bookings in production'
 end
-
-# Create a pending booking
-pending_booking = create_sample_booking(members[0], meeting_rooms.first, 3, status: :pending)
-bookings << pending_booking if pending_booking
-
-# Create a cancelled booking
-cancelled_booking = create_sample_booking(members[1], hot_desks.first, 5, status: :cancelled)
-bookings << cancelled_booking if cancelled_booking
-
-log '✓', "Created #{bookings.compact.count} bookings"
 
 # =============================================================================
 # SUMMARY
@@ -316,24 +333,26 @@ puts 'Seeding completed!'
 puts '=' * 60
 puts ''
 puts 'Summary:'
-puts "  Users:                 #{User.count}"
-puts "    - Admins:            #{User.role_admin.count}"
-puts "    - Members:           #{User.role_member.count}"
-puts "    - Guests:            #{User.role_guest.count}"
-puts ''
 puts "  Workspaces:            #{Workspace.count}"
 puts "    - Desks:             #{Workspace.workspace_type_desk.count}"
 puts "    - Private Offices:   #{Workspace.workspace_type_private_office.count}"
 puts "    - Meeting Rooms:     #{Workspace.workspace_type_meeting_room.count}"
 puts "    - Workshops:         #{Workspace.workspace_type_workshop.count}"
-puts ''
 puts "  Equipment:             #{WorkshopEquipment.count}"
-puts "  Memberships:           #{Membership.count}"
-puts "  Cantina Subscriptions: #{CantinaSubscription.count}"
-puts "  Bookings:              #{Booking.count}"
-puts ''
-puts 'Test accounts:'
-puts "  Admin:    admin@coworkhub.com / password123"
-puts "  Member:   member1@example.com / password123"
-puts "  Guest:    guest1@example.com / password123"
+
+if Rails.env.development? || Rails.env.test?
+  puts ''
+  puts "  Users:                 #{User.count}"
+  puts "    - Admins:            #{User.role_admin.count}"
+  puts "    - Members:           #{User.role_member.count}"
+  puts "    - Guests:            #{User.role_guest.count}"
+  puts "  Memberships:           #{Membership.count}"
+  puts "  Cantina Subscriptions: #{CantinaSubscription.count}"
+  puts "  Bookings:              #{Booking.count}"
+  puts ''
+  puts 'Test accounts:'
+  puts "  Admin:    admin@coworkhub.com / password123"
+  puts "  Member:   member1@example.com / password123"
+  puts "  Guest:    guest1@example.com / password123"
+end
 puts ''
