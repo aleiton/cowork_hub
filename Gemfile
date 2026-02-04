@@ -172,6 +172,9 @@ group :development, :test do
 end
 
 group :development do
+  # Pretty print objects in console (colored, formatted output)
+  gem 'awesome_print'
+
   # Bullet detects N+1 queries and unused eager loading.
   # It shows warnings when you should add includes() to avoid extra queries.
   # CRITICAL for performance - always run in development!
