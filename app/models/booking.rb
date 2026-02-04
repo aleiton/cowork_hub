@@ -57,6 +57,17 @@ class Booking < ApplicationRecord
   }, prefix: true
 
   # ===========================================================================
+  # RANSACK CONFIGURATION (for ActiveAdmin search/filters)
+  # ===========================================================================
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id workspace_id user_id date start_time end_time status created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[workspace user]
+  end
+
+  # ===========================================================================
   # VALIDATIONS
   # ===========================================================================
 

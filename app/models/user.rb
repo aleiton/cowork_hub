@@ -118,6 +118,17 @@ class User < ApplicationRecord
   # This avoids conflicts with other potential 'admin?' methods
 
   # ===========================================================================
+  # RANSACK CONFIGURATION (for ActiveAdmin search/filters)
+  # ===========================================================================
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id email role created_at updated_at locked_at failed_attempts]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[bookings memberships cantina_subscriptions]
+  end
+
+  # ===========================================================================
   # VALIDATIONS
   # ===========================================================================
   # Validations ensure data integrity. They run before saving to the database.

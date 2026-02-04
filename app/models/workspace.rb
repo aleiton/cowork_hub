@@ -68,6 +68,17 @@ class Workspace < ApplicationRecord
   }, prefix: true
 
   # ===========================================================================
+  # RANSACK CONFIGURATION (for ActiveAdmin search/filters)
+  # ===========================================================================
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id name description workspace_type capacity hourly_rate amenity_tier created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[bookings workshop_equipments users]
+  end
+
+  # ===========================================================================
   # VALIDATIONS
   # ===========================================================================
 

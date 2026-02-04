@@ -20,6 +20,7 @@ require 'rails/all'
 # The :default group is always loaded, plus the current Rails.env group.
 Bundler.require(*Rails.groups)
 
+
 module CoworkHub
   class Application < Rails::Application
     # ==========================================================================
@@ -33,12 +34,15 @@ module CoworkHub
     # ==========================================================================
     # API MODE
     # ==========================================================================
-    # We're building an API-only application (no server-rendered views).
-    # This removes middleware we don't need (cookies, sessions, flash messages,
-    # static file serving, etc.) making the app lighter and faster.
+    # We're primarily building an API application, but we need full Rails
+    # for ActiveAdmin's web interface. API controllers explicitly inherit
+    # from ActionController::API for optimal performance.
     #
-    # If you needed a traditional Rails app with views, you'd remove this.
-    config.api_only = true
+    # Setting api_only = false enables:
+    # - View helpers needed by ActiveAdmin
+    # - Asset pipeline for admin stylesheets
+    # - Flash messages for admin notifications
+    config.api_only = false
 
     # ==========================================================================
     # AUTOLOAD PATHS
@@ -106,5 +110,11 @@ module CoworkHub
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore,
                           config.session_options
+
+    # ==========================================================================
+    # FLASH MESSAGES (FOR ACTIVEADMIN)
+    # ==========================================================================
+    # ActiveAdmin requires flash messages for notifications.
+    config.middleware.use ActionDispatch::Flash
   end
 end

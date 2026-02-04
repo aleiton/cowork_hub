@@ -211,3 +211,15 @@ end
 gem "dockerfile-rails", ">= 1.7", group: :development
 
 gem "redis", "~> 5.4"
+
+# =============================================================================
+# ADMIN PANEL
+# =============================================================================
+# ActiveAdmin provides a full-featured admin dashboard with:
+# - CRUD interfaces for all models
+# - Customizable forms and filters
+# - Built-in authentication integration
+gem 'activeadmin', '~> 3.2'
+
+# sassc-rails is required for ActiveAdmin stylesheets
+gem 'sassc-rails'

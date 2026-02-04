@@ -119,8 +119,8 @@ Devise.setup do |config|
   # NAVIGATION/RESPONSES
   # ===========================================================================
 
-  # Path after sign out.
-  config.sign_out_via = :delete
+  # Path after sign out. Allow both DELETE (API) and GET (admin panel)
+  config.sign_out_via = %i[delete get]
 
   # Use Turbo-compatible responses (Rails 7+ with Hotwire).
   # For API-only apps, this doesn't matter much.

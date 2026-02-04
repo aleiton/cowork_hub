@@ -18,13 +18,16 @@
 
 module Users
   class SessionsController < Devise::SessionsController
-    # Tell Devise to respond with JSON
-    respond_to :json
+    # Respond with JSON for API requests, HTML for browser requests (admin login)
+    respond_to :json, :html
 
     private
 
     # Custom response for successful sign in
     def respond_with(resource, _opts = {})
+      # For HTML requests (admin login), let Devise handle the redirect
+      return super if request.format.html?
+
       if resource.persisted?
         render json: {
           status: { code: 200, message: 'Logged in successfully.' },
@@ -43,6 +46,12 @@ module Users
 
     # Custom response for sign out
     def respond_to_on_destroy
+      # For HTML requests (admin logout), redirect to root
+      if request.format.html?
+        redirect_to root_path, notice: 'Logged out successfully.'
+        return
+      end
+
       if current_user
         render json: {
           status: { code: 200, message: 'Logged out successfully.' }

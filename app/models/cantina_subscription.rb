@@ -57,6 +57,17 @@ class CantinaSubscription < ApplicationRecord
   }, prefix: true
 
   # ===========================================================================
+  # RANSACK CONFIGURATION (for ActiveAdmin search/filters)
+  # ===========================================================================
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id user_id plan_type meals_remaining renews_at created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[user]
+  end
+
+  # ===========================================================================
   # CONSTANTS
   # ===========================================================================
 

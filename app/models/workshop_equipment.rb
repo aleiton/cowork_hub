@@ -50,6 +50,17 @@ class WorkshopEquipment < ApplicationRecord
   belongs_to :workspace
 
   # ===========================================================================
+  # RANSACK CONFIGURATION (for ActiveAdmin search/filters)
+  # ===========================================================================
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id workspace_id name description quantity_available created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[workspace]
+  end
+
+  # ===========================================================================
   # VALIDATIONS
   # ===========================================================================
 
